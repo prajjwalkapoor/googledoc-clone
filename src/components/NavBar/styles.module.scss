@@ -1,0 +1,14 @@
+.nav {
+    .navItem {
+        padding: 5px;
+        text-decoration: none;
+        border-radius: 5px;
+        color: #2f2f2f;
+        margin-right: 8px;
+
+        &:hover {
+            background-color: #2f2f2f11;
+        }
+
+    }
+}
