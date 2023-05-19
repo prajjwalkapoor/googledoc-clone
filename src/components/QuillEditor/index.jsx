@@ -1,5 +1,5 @@
 import { Paper } from "@mui/material";
-import { useQuill } from 'react-quilljs';
+import { useQuill } from 'react-quilljs-vite-fix';
 import 'quill/dist/quill.snow.css'; // Add css for snow theme
 import { useContext, useEffect } from "react";
 import { QuillContext } from "../../context/quillContext";
