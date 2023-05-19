@@ -1,25 +1,19 @@
-import { Grid, styled, Paper, Input, OutlinedInput, Link, Button, Avatar, IconButton } from '@mui/material'
+import { Grid, Button, Avatar, IconButton } from '@mui/material'
 import HistoryIcon from '@mui/icons-material/HistoryOutlined';
 import CommentIcon from '@mui/icons-material/InsertCommentOutlined';
 import VideoCallIcon from '@mui/icons-material/VideocamOutlined';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import DocSvg from '../../assets/doc.svg'
-import styles from './styles.module.scss'
 import CustomInput from '../../CustomMUIComponents/CustomInput';
 import NavBar from '../NavBar';
+import { useState } from 'react';
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-}));
 
 
 
 
 function Header() {
+    const [title, setTitle] = useState(localStorage.getItem('title') || 'Untitled Document')
     return (
         <>
             <Grid container direction="row" justifyContent="space-between" spacing={1} >
@@ -28,11 +22,16 @@ function Header() {
                         <img src={DocSvg} alt="DocSvg" width={60} height={70} style={{ paddingTop: '5px' }} />
                     </Grid>
                     <Grid container item xs={9} direction="column" justifyContent="center">
-                        <CustomInput defaultValue='Untitled Doument' sx={{
-                            outline: 'none',
-                            width: 'fit-content',
-                            padding: '5px 10px'
-                        }} />
+                        <CustomInput defaultValue={title}
+                            onChange={(e) => {
+                                setTitle(e.target.value)
+                                localStorage.setItem('title', e.target.value)
+                            }}
+                            sx={{
+                                outline: 'none',
+                                width: 'fit-content',
+                                padding: '5px 10px'
+                            }} />
                         <NavBar />
                     </Grid>
                 </Grid>

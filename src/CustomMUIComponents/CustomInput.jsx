@@ -13,7 +13,6 @@ const CustomInput = styled(TextField)({
             padding: "5px",
         },
         "& fieldset": {
-            // padding: "5px 10px",
             borderColor: 'transparent',
         },
         "&:hover fieldset": {

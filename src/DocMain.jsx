@@ -2,6 +2,7 @@ import { Box, Grid, Paper } from "@mui/material"
 import Header from "./components/Header"
 import ToolBar from "./components/ToolBar"
 import Sidebar from "./components/Sidebar"
+import QuillEditor from "./components/QuillEditor"
 
 function DocMain() {
     return (
@@ -18,11 +19,7 @@ function DocMain() {
                             overflowY: 'scroll',
                         }}>
                             <Grid item xs={6}>
-                                <Paper sx={{
-                                    height: '100vh',
-                                    marginTop: '1rem',
-                                    border: '1px solid #E0E0E0',
-                                }}></Paper>
+                                <QuillEditor />
                             </Grid>
                         </Grid>
                     </Grid>

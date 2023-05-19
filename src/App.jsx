@@ -1,12 +1,15 @@
 import './App.css'
 import DocMain from './DocMain'
+import QuillContextProvider from './context/quillContext'
 
 function App() {
 
 
   return (
     <>
-      <DocMain />
+      <QuillContextProvider>
+        <DocMain />
+      </QuillContextProvider>
     </>
   )
 }

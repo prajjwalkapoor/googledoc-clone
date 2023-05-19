@@ -1,5 +1,4 @@
 import { Grid, IconButton, MenuItem, Select } from "@mui/material";
-// import AddCommentOutlinedIcon from "@mui/icons-material/AddCommentOutlined";
 import {
     UndoOutlined, RedoOutlined, PrintOutlined, SpellcheckOutlined, FormatPaintOutlined,
     FormatBoldOutlined, FormatItalicOutlined, FormatUnderlinedOutlined,
@@ -8,14 +7,57 @@ import {
     FormatAlignLeftOutlined, FormatAlignCenterOutlined, FormatAlignRightOutlined, FormatAlignJustifyOutlined
 
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { QuillContext } from "../../context/quillContext";
 
 
 export default function ToolBar() {
-    const [textSize, setTextSize] = useState('Normal Text');
+    const { quill } = useContext(QuillContext);
+    const [textStyle, setTextStyle] = useState('normal');
+    const [textSize, setTextSize] = useState(15);
     const [font, setFont] = useState('Arial');
     const [zoomed, setZoomed] = useState(100);
     const [alignment, setAlignment] = useState('left');
+    const handleFormat = (format) => {
+        if (quill) {
+            if (format == 'ordered') { quill.format('list', 'ordered'); return };
+            quill.format(format, !quill.getFormat()[format]);
+
+        }
+    };
+    useEffect(() => {
+        handleTextStyling();
+    }, [textStyle])
+    useEffect(() => {
+        if (quill) {
+            // clear previous size
+            quill.format('size', false);
+            // add new size
+            quill.format('size', textSize);
+            if (quill.getSelection()) {
+                quill.formatText(quill.getSelection(), 'size', textSize);
+            }
+        }
+    }, [textSize])
+    const handleTextStyling = () => {
+        console.log(textStyle, "called");
+        if (quill) {
+            switch (textStyle) {
+                case 'normal':
+                    setTextSize('normal');
+                    return
+                case 'heading':
+                    setTextSize('huge');
+                    return
+                case 'subheading':
+                    setTextSize('large');
+                    return
+                default:
+                    return
+            }
+        }
+    }
+
     return (
         <Grid container xs={11.9} spacing={1} direction='row' alignContent='center' sx={{
             backgroundColor: '#edf2fa',
@@ -23,20 +65,20 @@ export default function ToolBar() {
             borderRadius: '25px'
         }}>
             <Grid container item xs={10} >
-                <IconButton aria-label="undo" size='medium'>
+                <IconButton aria-label="undo" size='medium' onClick={() => quill.history.undo()}>
                     <UndoOutlined size='medium' />
                 </IconButton>
 
-                <IconButton aria-label="redo" size='medium'>
+                <IconButton aria-label="redo" size='medium' onClick={() => quill.history.redo()}>
                     <RedoOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="print" size='medium'>
+                <IconButton aria-label="print" size='medium' onClick={() => window.print()}>
                     <PrintOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="spellcheck" size='medium'>
+                <IconButton aria-label="spellcheck" size='medium' disabled>
                     <SpellcheckOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="paint" size='medium'>
+                <IconButton aria-label="paint" size='medium' disabled>
                     <FormatPaintOutlined size='medium' />
                 </IconButton>
                 <Select
@@ -54,26 +96,28 @@ export default function ToolBar() {
                     <MenuItem value={125}>125%</MenuItem>
                 </Select>
                 <Select
-                    value={textSize}
+                    value={textStyle}
                     defaultValue="Normal Text"
-                    onChange={(e) => setTextSize(e.target.value)}
+                    onChange={(e) => {
+                        setTextStyle(e.target.value)
+
+                    }}
                     displayEmpty
                     inputProps={{ 'aria-label': 'Without label' }}
                     sx={selectStyles}
                 >
-                    <MenuItem value="Normal Text" selected>Normal Text</MenuItem>
-                    <MenuItem value="Title">Title</MenuItem>
-                    <MenuItem value="Subtitle">Subtitle</MenuItem>
-                    <MenuItem value="Heading 1">Heading 1</MenuItem>
-                    <MenuItem value="Heading 2">Heading 2</MenuItem>
-                    <MenuItem value="Heading 3">Heading 3</MenuItem>
-                    <MenuItem value="Options">Options</MenuItem>
+                    <MenuItem value="normal" selected>Normal Text</MenuItem>
+                    <MenuItem value="heading">Title</MenuItem>
+                    <MenuItem value="subheading">Subtitle</MenuItem>
 
                 </Select>
                 <Select
                     value={font}
                     defaultValue="Arial"
-                    onChange={(e) => setFont(e.target.value)}
+                    onChange={(e) => {
+                        setFont(e.target.value)
+                        quill.format('font', e.target.value);
+                    }}
                     displayEmpty
                     inputProps={{ 'aria-label': 'Without label' }}
                     sx={selectStyles}
@@ -96,39 +140,52 @@ export default function ToolBar() {
                     <MenuItem value="Lucida Console">Lucida Console</MenuItem>
 
                 </Select>
-                <IconButton aria-label="bold" size='medium'>
+                <IconButton aria-label="bold" size='medium' onClick={() => handleFormat('bold')}>
                     <FormatBoldOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="italic" size='medium'>
+                <IconButton aria-label="italic" size='medium' onClick={() => handleFormat('italic')}>
                     <FormatItalicOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="underline" size='medium'>
+                <IconButton aria-label="underline" size='medium' onClick={() => handleFormat('underline')}>
                     <FormatUnderlinedOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="textcolor" size='medium'>
+                <IconButton aria-label="textcolor" size='medium' disabled>
                     <FormatColorTextOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="colorize" size='medium'>
+                <IconButton aria-label="colorize" size='medium' disabled>
                     <ColorizeOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="link" size='medium'>
+                <IconButton aria-label="link" size='medium' onClick={() => {
+                    const range = quill.getSelection();
+                    if (range && range.length > 0) {
+                        const selectedText = quill.getText(range.index, range.length);
+                        quill.format('link', selectedText, 'user');
+                    }
+                }}>
                     <LinkOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="comment" size='medium'>
+                <IconButton aria-label="comment" size='medium' disabled>
                     <AddCommentOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="photo" size='medium'>
+                <IconButton aria-label="photo" size='medium' onClick={() => {
+                    quill.format('image', true);
+                }}>
                     <PhotoOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="bullets" size='medium'>
+                <IconButton aria-label="bullets" size='medium' onClick={() => handleFormat('list')}>
                     <FormatListBulletedOutlined size='medium' />
                 </IconButton>
-                <IconButton aria-label="numbers" size='medium'>
+                <IconButton aria-label="numbers" size='medium' onClick={() => handleFormat('ordered')}>
                     <FormatListNumberedOutlined size='medium' />
                 </IconButton>
                 <Select
                     value={alignment}
-                    onChange={(e) => setAlignment(e.target.value)}
+                    onChange={(e) => {
+                        setAlignment(e.target.value)
+                        quill.format('align', false);
+                        quill.format('align', e.target.value);
+                    }
+                    }
                     size="medium"
                     sx={selectStyles}
                     displayEmpty
